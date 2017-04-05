@@ -1,0 +1,197 @@
+﻿@model IEnumerable<ProjectOfJsonAndAjax.Models.tbl_student>
+@{
+    ViewBag.Title = "studentList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div style="padding-top:30px;"> 
+    <script type="text/javascript" src="../Content/fancybox/jquery.fancybox.js?v=2.1.5"></script>
+    <link rel="stylesheet" type="text/css" href="../Content/fancybox/jquery.fancybox.css?v=2.1.5" media="screen" />
+
+   @* ...............FancyBox...............................*@
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".fancybox-effects-a").fancybox({
+                helpers: {
+                    title: {
+                        type: 'outside'
+
+                    },
+                    overlay: {
+                        speedOut: 0
+                    }
+                }
+            });
+        });
+    </script>
+
+ @*   .........................Save and Edit..............................*@
+
+    <script>
+    function AddStudent() {
+        var Name = $("#Name").val();
+        var MobNo = $("#MobNo").val();
+        if (Name == "" || MobNo == "") {
+            alert("Name and Mobile are required");
+        }
+        else if (Name.length < 2 || Name.length > 50) {
+            alert("Name length between 2 and 50 characters");
+        }
+        else if (!isNaN(Name)) {
+            alert('Must input Name using letter!');
+        }
+        else {
+
+            var std_info = {
+                "Name": Name,
+                "MobNo": MobNo
+            };
+            $.ajax({
+                type: "POST",
+                url: "../student/AddStudent",
+                data: JSON.stringify(std_info),
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                cache: false,
+                success: function (data, textStatus, jqXHR) {
+                    alert(data.message);
+                    $('#after_create').load('@Url.Action("StdPart", "student")');
+                   
+                    $("#Name").val("");
+                    $("#MobNo").val("");
+                },
+                error: function () {
+                    alert(' Creation Failed!');
+
+                }
+            });
+        }
+    }
+
+        function edit(id, value1, value2){
+
+            $("#hidden_id").val(id);
+            $("#Name2").val(value1);
+            $("#MobNo2").val(value2);
+
+        }
+
+        function UpdateStudent() {
+            var StudentId = $("#hidden_id").val();
+            var Name = $("#Name2").val();
+            var MobNo = $("#MobNo2").val();
+            if (Name == "" || MobNo == "") {
+                alert("Name and Mobile are required");
+            }
+            else if (Name.length < 2 || Name.length > 50) {
+                alert("Name length between 2 and 50 characters");
+            }
+            else if (!isNaN(Name)) {
+                alert('Must input Name using letter!');
+            }
+            else {
+
+                var std_info = {
+                    "StudentId": StudentId,
+                    "Name": Name,
+                    "MobNo": MobNo
+                };
+                $.ajax({
+                    type: "POST",
+                    url: "../student/UpdateStudent",
+                    data: JSON.stringify(std_info),
+                    dataType: 'json',
+                    contentType: 'application/json; charset=utf-8',
+                    cache: false,
+                    success: function (data, textStatus, jqXHR) {
+                        alert(data.message);
+                        $('#after_create').load('@Url.Action("StdPart", "student")');
+                   
+                        $("#Name2").val("");
+                        $("#MobNo2").val("");
+                    },
+                    error: function () {
+                        alert(' Update Failed!');
+
+                    }
+                });
+            }
+        }
+
+        //Delete
+        function DeleteCourse(pid, that) {
+            if (confirm("Do you want to delete the Course: " + pid)) {
+                $.ajax({
+                    type: "POST",
+                    url: '/student/DeleteStudent',
+                    data: { id: pid },
+                    dataType: "json",
+                    success: function () {
+                        alert('Deleted Successfully');
+                        location = location.href;
+                        location.reload();
+                    }
+                });
+            }
+        }
+    </script>
+    <h3 style="text-align:center;">Student List</h3>  
+    <div>
+        <a class="fancybox-effects-a" href="#area">Add Value</a>
+    </div>
+
+    <div class="table-responsive" id="after_create">
+        <table class="table table-hover table-bordered table-striped">
+            <thead>
+                <tr class="success">
+                    <th>Name</th>
+                    <th>Mobile No</th>
+                    <th>Department Name</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            @foreach (var item in Model)
+            {
+                <tbody>
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>@item.MobNo</td>
+                        <td>@item.tbl_Department.DeptName</td>
+                        <td><a onclick="edit(@item.StudentId, '@item.Name', '@item.MobNo');"  class="fancybox-effects-a" href="#update2">Edit</a>
+                         <img src="~/Images/delete.png" alt="edit" style="cursor:pointer" onclick="DeleteCourse(@item.StudentId)" /></td>
+                    </tr>
+                </tbody>
+            }
+        </table>
+    </div>
+    <div id="area" style="display:none;">
+        <form>
+            <div class="form-group">
+                <label for="Name">Name</label>
+                <input type="text" class="form-control" id="Name">
+            </div>
+            <div class="form-group">
+                <label for="MobNo">MobNo</label>
+                <input type="text" class="form-control" id="MobNo">
+            </div>
+            <button type="button" id="AddStd" class="btn btn-default" onclick="AddStudent()">Submit</button>
+        </form>
+    </div>
+
+    <div id="update2" style="display:none;">
+        <form>
+            <div class="form-group">
+                <label for="Name">Name2</label>
+                <input type="hidden" id="hidden_id">
+                <input type="text" class="form-control" id="Name2">
+            </div>
+            <div class="form-group">
+                <label for="MobNo">MobNo</label>
+                <input type="text" class="form-control" id="MobNo2">
+            </div>
+            <button type="button" id="Update" class="btn btn-default" onclick="UpdateStudent()">Update</button>
+        </form>
+    </div>
+
+</div>

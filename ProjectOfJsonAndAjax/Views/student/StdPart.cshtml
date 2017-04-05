@@ -1,0 +1,28 @@
+﻿@model IEnumerable<ProjectOfJsonAndAjax.Models.tbl_student>
+
+<table class="table table-hover table-bordered table-striped">
+    <thead>
+        <tr class="success">
+            <th>Name</th>
+            <th>Mobile No</th>
+            <th>Department Name</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    @foreach (var item in Model)
+    {
+        <tbody>
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.MobNo</td>
+                <td>@item.tbl_Department.DeptName</td>
+                <td><a onclick="edit(@item.StudentId, '@item.Name', '@item.MobNo');" class="fancybox-effects-a" href="#update2">Edit</a>
+                @*<img src="~/Images/delete.png" alt="edit" style="cursor:pointer" onclick="DeleteCourse(@item.StudentId)" />*@
+                </td>
+            </tr>
+        </tbody>
+    }
+</table>
+
+
+
